@@ -1,0 +1,39 @@
+#%RAML 1.0 Trait
+responses:
+  
+    400:
+        body:
+          application/json:
+            example:
+              {
+                "msg": "bad request",
+                "code": 400,
+                "details": "The input contains invalid data"
+              }
+    404:
+        body:
+          application/json:
+            example:
+              {
+                "msg": "not found",
+                "code": 404,
+                "details": "The URI requested is invalid or the resource requested does not exists"
+              }   
+    401:  
+         body:
+          application/json:
+            example:
+              {
+                "msg": "unauthorized access",
+                "code": 401,
+                "details": "The Request is not Authorized"
+              }  
+    500:
+        body:
+          application/json:
+            example:
+              {
+                "msg": "server error",
+                "code": 500,
+                "details": "The server encountered an unexpected condition which prevented it from fulfilling the request"
+              }

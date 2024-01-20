@@ -1,0 +1,24 @@
+#%RAML 1.0 ResourceType
+get:
+    description: retrieve all notes stored in the database
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include ../DataType/get-notes-dataType.raml 
+            example: !include ../Examples/get-notes-example.raml 
+             
+              
+post:
+    description: Insert a new note record into the database.
+    body:
+      application/json:
+        type: !include ../DataType/notes-request-dataType.raml
+        example: !include ../Examples/notes-request-example.raml
+          
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include ../Examples/post-response-example.raml
+              

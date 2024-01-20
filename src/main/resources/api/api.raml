@@ -1,0 +1,29 @@
+#%RAML 1.0
+title: craft-notes-management-sapi
+baseUri: "/api"
+version: 1.0.0
+description: this raml contains api specification for craft note record management sapi.
+protocols:
+  - http
+  - https
+uses:
+  lib: exchange_modules/fc4471f1-b7fa-4e1e-bbe4-5c545b0333e6/cnm-common-fragments/1.0.2/cnm-common-fragments.raml
+securedBy:
+  - lib.security 
+
+
+/notes:
+  type:
+    lib.notes
+  is:
+     - lib.statusCodes
+
+
+  /{noteId}:
+    type:
+     lib.notesId
+    is:
+     - lib.statusCodes
+  
+
+    

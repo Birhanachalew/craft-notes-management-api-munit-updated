@@ -1,0 +1,9 @@
+#%RAML 1.0 Library
+usage: 
+resourceTypes:
+  notes: !include resources/notes-resourceType.raml
+  notesId: !include resources/notesId-resourceType.raml
+traits:
+  statusCodes: !include Traits/statusCodes.raml 
+securitySchemes:
+  security: !include securityScheme.raml  

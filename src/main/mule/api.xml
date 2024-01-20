@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="api-main">
+        <http:listener config-ref="api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-config" doc:id="5b2f66c7-6845-4898-a78c-753157d7dcc9"/>
+		<error-handler ref="globalError_handler_apikit" />
+        
+    </flow>
+    <flow name="api-console">
+        <http:listener config-ref="api-httpListenerConfig" path="${secure::http.cpath}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-config" doc:id="53e39fae-6640-4424-a5b4-e2d5a13f6cdd"/>
+		<error-handler ref="globalError_handler_apikit" />
+    
+</flow>
+    <flow name="put:\notes\(noteId):application\json:api-config">
+        <flow-ref doc:name="update-notes-by-id" doc:id="6cfabc61-cf6e-467b-9540-c774b8a75210" name="update-notes-by-id-impFlow"/>
+    </flow>
+    <flow name="delete:\notes\(noteId):api-config">
+        <flow-ref doc:name="delete-notes-by-id" doc:id="097f2a11-2870-4d37-8aaa-2c456ea34bf1" name="delete-notes-by-id-impFlow"/>
+    </flow>
+    <flow name="get:\notes:api-config">
+        <flow-ref doc:name="retrieve-notes" doc:id="1fda27fc-acd7-44e7-bc61-52ff68435177" name="retrieve-notesFlow"/>
+    </flow>
+    <flow name="get:\notes\(noteId):api-config" doc:id="bb30b34a-d982-4f45-9485-00bb9b6b7b11">
+        <flow-ref doc:name="retrieve-notes-by-id" doc:id="ad30f49b-be4a-483d-bcb1-24fe784c6db2" name="retrieve-notes-by-id-impFlow"/>
+    </flow>
+    <flow name="post:\notes:application\json:api-config">
+		<flow-ref doc:name="create-notes" doc:id="a25c0c49-6e1e-43b1-85db-1ea8fff7e21e" name="create-notes-impFlow"/>
+    </flow>
+</mule>

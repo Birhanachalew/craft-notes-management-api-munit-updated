@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="update-notes-by-id-impFlow" doc:id="42c9e94b-e129-4508-8503-c8f7e2bb8f40" >
+		<flow-ref doc:name="retrive_note" doc:id="1286299e-97e2-468d-adde-f9808520c536" name="retrieve-notes-by-id-impFlow" target="data" />
+		<choice doc:name="routing" doc:id="03611d4e-ae1a-4926-b54a-171dc70c4c6e" >
+			<when expression="#[sizeOf(vars.data) &gt; 0]">
+				<logger level="INFO" doc:name="before_db_call" doc:id="5ddb32ab-b41b-4b8e-9d42-d061ebd121a6" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;Before DB Call&quot;&#10;}]"/>
+				<db:update doc:name="notes_db" doc:id="e4533c6d-09af-4b3e-8732-293d734513ef" config-ref="Database_Config">
+			<db:sql><![CDATA[update NOTES_B32_TEAM_C_DEV set title=:title, content=:content, updatedAt=:updatedAt where id=:id ]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	"id": attributes.uriParams.noteId,
+	"title": payload.title,
+	"content": payload.content,
+	"updatedAt": (now()>>"EST") as String {format: 'yyyy-MM-dd hh:mm:ss'}
+}]]]></db:input-parameters>
+		</db:update>
+				<logger level="INFO" doc:name="after_db_call" doc:id="d28424e0-41cf-43b1-a48e-e70907477196" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;After DB Call&quot;&#10;}]"/>
+				<ee:transform doc:name="output_map" doc:id="3ee44f9b-9749-44df-82d1-7999d32fbc2f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message":"data updated successfully!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="create_notes" doc:id="667ff663-3ab0-4963-9fa4-341fba954690" name="create-notes-impFlow"/>
+				<ee:transform doc:name="output_map" doc:id="69f3041f-70bc-4ab1-9cd1-8dc34f5bef1d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "No Records Found Data Inserted as a New Record"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler ref="commonError_Handler_flowlevel" />
+		
+	
+</flow>
+	
+	</mule>

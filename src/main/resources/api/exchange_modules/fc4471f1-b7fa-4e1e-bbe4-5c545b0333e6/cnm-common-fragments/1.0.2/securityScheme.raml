@@ -1,0 +1,14 @@
+#%RAML 1.0 SecurityScheme
+type: x-oauth-custom
+description: Oauth Token Based Security
+describedBy:
+  headers:
+    client_id:
+      description: Client Id in base 64 format
+      type: string
+      example: "3478yhrudfjiywokdjfjurh58"
+        
+    client_secret:
+      description: Client Secret in base 64 format
+      type: string
+      example: "3478yhrudfjiywokdjfjurh58"

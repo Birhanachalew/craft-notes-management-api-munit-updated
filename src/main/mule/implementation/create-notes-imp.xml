@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="create-notes-impFlow" doc:id="fb7bf518-133d-4ba2-bd4c-c056302d33e2" >
+		<logger level="INFO" doc:name="before_db_call" doc:id="79c99790-05cd-40bc-9029-9623d2dcc90d" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;Before DB Call&quot;&#10;}]"/>
+		<db:insert doc:name="notes_db" doc:id="a20d4ecf-7330-48db-9066-376c2d1fa0c7" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into NOTES_B32_TEAM_C_DEV (title, content, createdAt, updatedAt)values (:title, :content, :createdAt, :updatedAt)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"title": payload.title,
+	"content": payload.content,
+	"createdAt":(now()>> "EST") as String {format: 'yyyy-MM-dd hh:mm:ss'},
+	"updatedAt": (now()>>"EST") as String {format: 'yyyy-MM-dd hh:mm:ss'}
+}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="after_db_call" doc:id="5de49b86-6d36-49a3-ac25-37528bed2e3e" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;After DB Call&quot;&#10;}]" />
+		<ee:transform doc:name="output_map" doc:id="3f9688c5-fb04-437f-82fd-e3ecb48a12ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "data inserted successfully!"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="commonError_Handler_flowlevel" />
+		
+		
+	
+</flow>
+	
+	
+	</mule>

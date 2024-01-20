@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="retrieve-notes-by-id-impFlow" doc:id="2a8717f8-8e0b-47d1-b011-7f717db012e6" >
+		<logger level="INFO" doc:name="before_db_call" doc:id="17b10217-ef47-4eef-b8ab-d8415a620450" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;Before DB Call&quot;&#10;}]"/>
+		<db:select doc:name="notes_db" doc:id="ecf81cc9-a7b1-4c5f-91e9-ee573be25eea" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * from NOTES_B32_TEAM_C_DEV where id=:id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"id": attributes.uriParams.noteId
+}]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="after_db_call" doc:id="111c8141-094b-4bb1-ae62-b099e47b58cd" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;After DB Call&quot;&#10;}]"/>
+		<ee:transform doc:name="output_map" doc:id="d3cc8f9c-be1d-44a6-9a80-aa6b2e043d10" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map{
+	id: $.id,
+	title: $.title,
+	content: $.content,
+	createdAt: $.createdAt,
+	updatedAt: $.updatedAt
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="commonError_Handler_flowlevel" />
+		
+	
+</flow>
+	
+	
+	</mule>

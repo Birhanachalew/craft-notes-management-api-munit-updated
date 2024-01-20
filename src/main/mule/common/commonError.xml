@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<error-handler name="commonError_Handler_flowlevel" doc:id="8255a60c-d4c8-4a95-84e8-939db9f9581a" >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="541210d5-7c1c-47cc-87a0-7b891dfe7066" type="DB:BAD_SQL_SYNTAX, DB:CONNECTIVITY, DB:QUERY_EXECUTION, DB:RETRY_EXHAUSTED">
+			<logger level="INFO" doc:name="error_log" doc:id="253ccba8-c95e-4e4a-ae60-cb4a91d37e55" message="#[%dw 2.0&#10;output application/json&#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;DB error&quot;&#10;}]" />
+			<ee:transform doc:name="db_error_rsp" doc:id="a09b2b58-4c63-48c3-b31b-25996e2893c1" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message":  error.errorType.asString,
+	"Code": 500,
+	"Details": "Database Error"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a6754a48-d6a2-44c7-ac25-5ed44c782563" type="ANY">
+			<logger level="INFO" doc:name="error_log" doc:id="caf45288-31f1-4bd5-b18b-f6642bdc00c8" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	timeStamp:(now()&gt;&gt; &quot;EST&quot;) as String {format: 'yyyy-MM-dd hh:mm:ss'},&#10;	appName: app.name,&#10;	floowName: flow.name, &#10;	state: &quot;System error&quot;&#10;}]" />
+			<ee:transform doc:name="sysapi_error_rsp" doc:id="0219d34e-8070-40a6-81b3-e3a9221076c3" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Message":  error.errorType.asString,
+	"Code": 500,
+	"Details": "System Error"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		
+</on-error-propagate>
+		
+</error-handler>
+		
+	
+	
+	</mule>

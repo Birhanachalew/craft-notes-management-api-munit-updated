@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_2a8717f8_8e0b_47d1_b011_7f717db012e6_Output_Payload = Array<{|  id: Number,   title: String | Null,   content: String | Null,   createdAt: Date | Null,   updatedAt: Date | Null|}>
+
